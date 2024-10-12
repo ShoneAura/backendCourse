@@ -34,5 +34,37 @@ async def create_hotel(
     )
 
 
+@app.put("/hotels/<hotel_id>")
+async def update_hotel(
+        hotel_id: int,
+        title: str = Body(),
+        name: str = Body(),
+):
+    global hotels
+    for hotel in hotels:
+        if hotel["id"] == hotel_id:
+            hotel["title"] = title
+            hotel["name"] = name
+            return hotel
+    return {"message": f"Отель с айдишником {hotel_id} не найден"}
+
+
+@app.patch("/hotels/<hotel_id>")
+async def patch_hotel(
+        hotel_id: int,
+        title: str | None = Body(None),
+        name: str | None = Body(None)
+):
+    global hotels
+    for hotel in hotels:
+        if hotel["id"] == hotel_id:
+            if title:
+                hotel["title"] = title
+            if name:
+                hotel["name"] = name
+            return hotel
+    return {"message": f"Отель с айдишником {hotel_id} не найден"}
+
+
 if __name__ == "__main__":
     uvicorn.run("main:app", reload=True)
