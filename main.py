@@ -49,7 +49,11 @@ async def update_hotel(
     return {"message": f"Отель с айдишником {hotel_id} не найден"}
 
 
-@app.patch("/hotels/<hotel_id>")
+@app.patch(
+    "/hotels/<hotel_id>",
+    summary="Частичное обновление данных об отеле",
+    description="Мы обновляем разные данные об отеле"
+)
 async def patch_hotel(
         hotel_id: int,
         title: str | None = Body(None),
