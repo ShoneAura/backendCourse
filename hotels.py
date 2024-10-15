@@ -16,10 +16,10 @@ hotels = [
     description="Возвращает список всех отелей"
 )
 async def get_hotels(
-        title: str = Query(None, description="Название отеля"),
-        id: int = Query(None, description="Айдишник отеля"),
-        page: int = Query(None, description="Номер страницы"),
-        per_page: int = Query(10, description="Количество отелей на странице"),
+        title: str | None = Query(None, description="Название отеля"),
+        id: int | None = Query(None, description="Айдишник отеля"),
+        page: int | None = Query(None, description="Номер страницы", gt=1),
+        per_page: int | None = Query(None, description="Количество отелей на странице", gt=1, lt=30),
 ):
     DEFAULT_COUNT_PER_PAGE = 3
     hotels_ = []
@@ -29,13 +29,9 @@ async def get_hotels(
         if title and hotel["title"] != title:
             continue
         hotels_.append(hotel)
-    if not page or page <= 0:
-        page = 1
-    if page > len(hotels) // per_page:
-        page = len(hotels) // per_page or 1
-    if not per_page or per_page < 0:
-        per_page = DEFAULT_COUNT_PER_PAGE
-    return hotels_[(page - 1) * per_page: page * per_page]
+    if page or per_page:
+        return hotels_[(page - 1) * per_page:][:per_page]
+    return hotels_
 
 
 @router.delete(
