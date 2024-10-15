@@ -17,24 +17,9 @@ hotels = [
 )
 async def get_hotels(
         title: str = Query(None, description="Название отеля"),
-        id: int = Query(None, description="Айдишник отеля"),
-        page: int = Query(None, description="Номер страницы"),
-        per_page: int = Query(10, description="Количество отелей на странице"),
+        id: int = Query(None, description="Айдишник отеля")
 ):
-    hotels_ = []
-    for hotel in hotels:
-        if id and hotel["id"] != id:
-            continue
-        if title and hotel["title"] != title:
-            continue
-        hotels_.append(hotel)
-    if page > len(hotels) // per_page:
-        page = len(hotels) // per_page
-    if page <= 0:
-        page = 1
-    if per_page < 0:
-        per_page = 10
-    return hotels_[(page - 1) * per_page: page * per_page]
+    return hotels
 
 
 @router.delete(
@@ -53,7 +38,7 @@ async def delete_hotel(hotel_id: int):
     summary="Добавление отеля",
     description="Добавляет отель, необходимо отправить данные об отеле"
 )
-async def create_hotel(hotel_data: Hotel = Body(openapi_examples={
+async def create_hotel(hotel_data: Hotel=Body(openapi_examples={
     "1": {"summary": "Сочи", "value": {
         "title": "Отель Sochi",
         "name": "sochi_u_morya"
