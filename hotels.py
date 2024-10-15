@@ -7,6 +7,13 @@ router = APIRouter(prefix="/hotels", tags=["Отели"])
 hotels = [
     {"id": 1, "title": "Sochi", "name": "sochi"},
     {"id": 2, "title": "Дубай", "name": "dubai"},
+    {"id": 3, "title": "Пекин", "name": "beijing"},
+    {"id": 4, "title": "Москва", "name": "moscow"},
+    {"id": 5, "title": "Лондон", "name": "london"},
+    {"id": 6, "title": "Токио", "name": "tokyo"},
+    {"id": 7, "title": "Париж", "name": "paris"},
+    {"id": 8, "title": "Ливерпуль", "name": "liverpool"},
+    {"id": 9, "title": "Милан", "name": "milan"},
 ]
 
 
