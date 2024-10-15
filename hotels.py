@@ -1,5 +1,6 @@
 from fastapi import Query, APIRouter, Body
 
+from backendCourse.dependencies import PaginationDep
 from backendCourse.schemas.hotels import Hotel, HotelPATCH
 
 router = APIRouter(prefix="/hotels", tags=["Отели"])
@@ -7,6 +8,13 @@ router = APIRouter(prefix="/hotels", tags=["Отели"])
 hotels = [
     {"id": 1, "title": "Sochi", "name": "sochi"},
     {"id": 2, "title": "Дубай", "name": "dubai"},
+    {"id": 3, "title": "Пекин", "name": "beijing"},
+    {"id": 4, "title": "Москва", "name": "moscow"},
+    {"id": 5, "title": "Лондон", "name": "london"},
+    {"id": 6, "title": "Токио", "name": "tokyo"},
+    {"id": 7, "title": "Париж", "name": "paris"},
+    {"id": 8, "title": "Ливерпуль", "name": "liverpool"},
+    {"id": 9, "title": "Милан", "name": "milan"},
 ]
 
 
@@ -16,12 +24,10 @@ hotels = [
     description="Возвращает список всех отелей"
 )
 async def get_hotels(
-        title: str = Query(None, description="Название отеля"),
-        id: int = Query(None, description="Айдишник отеля"),
-        page: int = Query(None, description="Номер страницы"),
-        per_page: int = Query(10, description="Количество отелей на странице"),
+        pagination: PaginationDep,
+        id: int | None = Query(None, description="Айдишник отеля"),
+        title: str | None = Query(None, description="Название отеля"),
 ):
-    DEFAULT_COUNT_PER_PAGE = 3
     hotels_ = []
     for hotel in hotels:
         if id and hotel["id"] != id:
@@ -29,13 +35,9 @@ async def get_hotels(
         if title and hotel["title"] != title:
             continue
         hotels_.append(hotel)
-    if not page or page <= 0:
-        page = 1
-    if page > len(hotels) // per_page:
-        page = len(hotels) // per_page or 1
-    if not per_page or per_page < 0:
-        per_page = DEFAULT_COUNT_PER_PAGE
-    return hotels_[(page - 1) * per_page: page * per_page]
+    if pagination.page or pagination.per_page:
+        return hotels_[(pagination.page - 1) * pagination.per_page:][:pagination.per_page]
+    return hotels_
 
 
 @router.delete(
