@@ -21,6 +21,7 @@ async def get_hotels(
         page: int = Query(None, description="Номер страницы"),
         per_page: int = Query(10, description="Количество отелей на странице"),
 ):
+    DEFAULT_COUNT_PER_PAGE = 3
     hotels_ = []
     for hotel in hotels:
         if id and hotel["id"] != id:
@@ -28,12 +29,12 @@ async def get_hotels(
         if title and hotel["title"] != title:
             continue
         hotels_.append(hotel)
-    if page > len(hotels) // per_page:
-        page = len(hotels) // per_page
-    if page <= 0:
+    if not page or page <= 0:
         page = 1
-    if per_page < 0:
-        per_page = 10
+    if page > len(hotels) // per_page:
+        page = len(hotels) // per_page or 1
+    if not per_page or per_page < 0:
+        per_page = DEFAULT_COUNT_PER_PAGE
     return hotels_[(page - 1) * per_page: page * per_page]
 
 
