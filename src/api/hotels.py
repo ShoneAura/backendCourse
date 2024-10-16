@@ -1,9 +1,7 @@
 from fastapi import Query, APIRouter, Body
-from sqlalchemy import insert, select, func
 
 from src.api.dependencies import PaginationDep
-from src.database import async_session_maker, engine
-from src.models.hotels import HotelsOrm
+from src.database import async_session_maker
 from src.repositories.hotels import HotelsRepository
 from src.schemas.hotels import Hotel, HotelPATCH
 
@@ -30,6 +28,14 @@ async def get_hotels(
         )
 
 
+@router.get(
+    "/<hotel_id>",
+    summary="Получение отеля",
+    description="Возвращает отель по id"
+)
+async def get_hotel(hotel_id: int):
+    async with async_session_maker() as session:
+        return await HotelsRepository(session).get_one_or_none(id=hotel_id)
 
 
 @router.post(
@@ -37,7 +43,7 @@ async def get_hotels(
     summary="Добавление отеля",
     description="Добавляет отель, необходимо отправить данные об отеле"
 )
-async def create_hotel(hotel_data: Hotel=Body(openapi_examples={
+async def create_hotel(hotel_data: Hotel = Body(openapi_examples={
     "1": {"summary": "Сочи", "value": {
         "title": "Отель Sochi",
         "location": "ул. Море 5"
@@ -51,7 +57,6 @@ async def create_hotel(hotel_data: Hotel=Body(openapi_examples={
     async with async_session_maker() as session:
         hotel = await HotelsRepository(session).add(hotel_data)
         await session.commit()
-
     return {"status": "OK", "data": hotel}
 
 
@@ -64,7 +69,6 @@ async def delete_hotel(hotel_id: int):
     async with async_session_maker() as session:
         await HotelsRepository(session).delete(id=hotel_id)
         await session.commit()
-
     return {"status": "OK"}
 
 
@@ -93,12 +97,7 @@ async def patch_hotel(
         hotel_id: int,
         hotel_data: HotelPATCH,
 ):
-    global hotels
-    for hotel in hotels:
-        if hotel["id"] == hotel_id:
-            if hotel_data.title:
-                hotel["title"] = hotel_data.title
-            if hotel_data.name:
-                hotel["name"] = hotel_data.name
-            return hotel
-    return {"message": f"Отель с айдишником {hotel_id} не найден"}
+    async with async_session_maker() as session:
+        await HotelsRepository(session).update(hotel_data, exclude_unset=True, id=hotel_id)
+        await session.commit()
+    return {"status": "OK"}
