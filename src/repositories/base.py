@@ -27,10 +27,10 @@ class BaseRepository:
         delete_stmt = delete(self.model).filter_by(**filter_by)
         await self.session.execute(delete_stmt)
 
-    async def update(self, data: BaseModel, **filter_by):
-        update_data_stmt = (update(self.model)
-                            .filter_by(**filter_by)
-                            .values(**data.model_dump())
-                            )
-        await self.session.execute(update_data_stmt)
-
+    async def update(self, data: BaseModel, exclude_unset: bool = False, **filter_by):
+        update_stmt = (
+            update(self.model)
+            .filter_by(**filter_by)
+            .values(**data.model_dump(exclude_unset=exclude_unset))
+        )
+        await self.session.execute(update_stmt)
