@@ -39,3 +39,10 @@ async def login_user(
         return {"access_token": access_token}
 
 
+@router.get('/only_auth')
+async def only_auth(
+        request: Request,
+):
+    cookies = request.cookies
+    access_token = cookies.get("access_token", None)
+    return {"access_token": access_token}
