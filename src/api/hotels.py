@@ -3,7 +3,7 @@ from fastapi import Query, APIRouter, Body
 from src.api.dependencies import PaginationDep
 from src.database import async_session_maker
 from src.repositories.hotels import HotelsRepository
-from src.schemas.hotels import Hotel, HotelPATCH, HotelAdd
+from src.schemas.hotels import Hotel, HotelPatch, HotelAdd
 
 router = APIRouter(prefix="/hotels", tags=["Отели"])
 
@@ -88,7 +88,7 @@ async def update_hotel(
 )
 async def patch_hotel(
     hotel_id: int,
-    hotel_data: HotelPATCH,
+    hotel_data: HotelPatch,
 ):
     async with async_session_maker() as session:
         await HotelsRepository(session).update(
