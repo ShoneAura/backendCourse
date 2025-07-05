@@ -1,33 +1,10 @@
-from fastapi import APIRouter, Body
+from fastapi import APIRouter, Body, HTTPException
 
 from src.api.dependencies import DBDep, UserIdDep
 from src.schemas.bookings import BookingAddRequest, BookingAdd
-from src.schemas.rooms import (
-    RoomAdd,
-    RoomAddRequest,
-    RoomPatchRequest,
-    RoomPatch,
-)
+
 
 router = APIRouter(prefix="/bookings", tags=["бронирование"])
-
-
-# @router.get(
-#     "/{hotel_id}/rooms",
-#     summary="Получение всех комнат",
-#     description="Возвращает список всех комнат",
-# )
-# async def get_rooms(hotel_id: int, db: DBDep):
-#     return await db.rooms.get_filtered(hotel_id=hotel_id)
-#
-#
-# @router.get(
-#     "/{hotel_id}/rooms/{room_id}",
-#     summary="Получение отеля",
-#     description="Возвращает отель по id",
-# )
-# async def get_room(hotel_id: int, room_id: int, db: DBDep):
-#     return await db.rooms.get_one_or_none(id=room_id, hotel_id=hotel_id)
 
 
 @router.post(
@@ -35,18 +12,38 @@ router = APIRouter(prefix="/bookings", tags=["бронирование"])
     summary="Добавление бронирования",
     description="Добавляет номер, необходимо отправить данные о бронировании",
 )
-async def create_booking(
+async def add_booking(
     user_id: UserIdDep,
     db: DBDep,
     booking_data: BookingAddRequest = Body(),
 ):
     room = await db.rooms.get_one_or_none(id=booking_data.room_id)
+    if not room:
+        raise HTTPException(status_code=404, detail="передан не корректный id номера")
     _booking_data = BookingAdd(
         user_id=user_id, price=room.price, **booking_data.model_dump()
     )
     booking = await db.bookings.add(_booking_data)
     await db.commit()
     return {"status": "OK", "data": booking}
+
+
+@router.get(
+    "/bookings",
+    summary="Получение всех бронирований",
+    description="Возвращает список всех бронирований",
+)
+async def get_bookings(db: DBDep):
+    return await db.bookings.get_all()
+
+
+@router.get(
+    "/bookings/me",
+    summary="Получение бронирований пользователя",
+    description="Возвращает все бронирования пользователя",
+)
+async def get_bookings_me(db: DBDep, user_id: UserIdDep):
+    return await db.bookings.get_filtered(user_id=user_id)
 
 
 # @router.delete(
