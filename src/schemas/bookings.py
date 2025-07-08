@@ -2,14 +2,16 @@ from datetime import date
 
 from pydantic import BaseModel, ConfigDict
 
+from src.schemas.base import TimestampSchema
 
-class BookingAddRequest(BaseModel):
+
+class BookingAddRequest(TimestampSchema):
     room_id: int
     date_from: date
     date_to: date
 
 
-class BookingAdd(BaseModel):
+class BookingAdd(TimestampSchema):
     user_id: int
     room_id: int
     date_from: date

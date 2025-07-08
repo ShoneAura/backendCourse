@@ -1,7 +1,9 @@
+from datetime import date
+
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import String
 
-from src.database import Base
+from src.models.base import Base
 
 
 class HotelsOrm(Base):
