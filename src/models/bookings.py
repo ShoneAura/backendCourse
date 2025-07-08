@@ -5,10 +5,10 @@ from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import ForeignKey
 from sqlalchemy import String
 
-from src.database import Base
+from src.models.base import Base, TimestampMixin
 
 
-class BookingsOrm(Base):
+class BookingsOrm(TimestampMixin, Base):
     __tablename__ = "bookings"
 
     id: Mapped[int] = mapped_column(primary_key=True)
