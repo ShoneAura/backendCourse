@@ -3,7 +3,7 @@ from datetime import date
 from fastapi import APIRouter, Body
 
 from src.api.dependencies import DBDep
-from src.schemas.facilities import FacilitiesAdd
+from src.schemas.facilities import FacilityAdd
 
 router = APIRouter(prefix="/facilities", tags=["Удобства"])
 
@@ -20,10 +20,10 @@ async def get_facilities(db: DBDep):
     summary="Добавление удобства",
     description="Добавляет удобство",
 )
-async def create_facilities(
+async def create_facility(
     db: DBDep,
-    facilities_data: FacilitiesAdd = Body(),
+    facility_data: FacilityAdd = Body(),
 ):
-    facility = await db.facilities.add(facilities_data)
+    facility = await db.facilities.add(facility_data)
     await db.commit()
     return {"status": "OK", "data": facility}
