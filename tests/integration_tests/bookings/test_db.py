@@ -17,10 +17,14 @@ async def test_booking_crud(db):
     }
     booking_data = BookingAdd(**booking_data)
 
-    await db.bookings.add(booking_data)
-    booking = await db.bookings.get_one_or_none()
+    new_booking = await db.bookings.add(booking_data)
+    booking = await db.bookings.get_one_or_none(id=new_booking.id)
     assert booking
-    booking_data = Booking(
+    assert booking.price == 100
+    assert booking.user_id == new_booking.user_id
+    assert booking.room_id == new_booking.room_id
+
+    update_booking_data = Booking(
         id=booking.id,
         user_id=booking.user_id,
         room_id=booking.room_id,
@@ -30,10 +34,13 @@ async def test_booking_crud(db):
         created_at=booking.created_at,
         updated_at=booking.updated_at,
     )
-    await db.bookings.update(booking_data)
-    booking = await db.bookings.get_one_or_none(id=booking.id)
-    assert booking.price == 200
+    await db.bookings.update(update_booking_data)
+    updated_booking = await db.bookings.get_one_or_none(id=booking.id)
+    assert updated_booking
+    assert updated_booking.price == 200
+    assert updated_booking.user_id == new_booking.user_id
+    assert updated_booking.room_id == new_booking.room_id
+
     await db.bookings.delete(id=booking.id)
     booking = await db.bookings.get_one_or_none(id=booking.id)
     assert not booking
-    await db.commit()
