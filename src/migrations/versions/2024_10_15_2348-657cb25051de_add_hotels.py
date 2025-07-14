@@ -1,7 +1,7 @@
 """add hotels
 
 Revision ID: 657cb25051de
-Revises: 
+Revises:
 Create Date: 2024-10-15 23:48:58.113267
 
 """

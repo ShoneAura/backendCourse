@@ -15,7 +15,6 @@ def test_task():
 
 # @celery_instance.task
 def resize_image(image_path: str):
-
     sizes = [1000, 500, 200]
 
     output_folder = "src/static/images"
@@ -24,7 +23,6 @@ def resize_image(image_path: str):
     name, ext = os.path.splitext(base_name)
 
     for size in sizes:
-
         img_resized = img.resize(
             (size, int(img.height * (size / img.width))), Image.Resampling.LANCZOS
         )

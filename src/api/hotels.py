@@ -87,7 +87,6 @@ async def update_hotel(hotel_id: int, hotel_data: HotelAdd, db: DBDep):
     description="Мы обновляем разные данные об отеле",
 )
 async def patch_hotel(hotel_id: int, hotel_data: HotelPatch, db: DBDep):
-
     await db.hotels.update(hotel_data, exclude_unset=True, id=hotel_id)
     await db.commit()
     return {"status": "OK"}

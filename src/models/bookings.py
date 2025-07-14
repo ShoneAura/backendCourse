@@ -3,7 +3,6 @@ from datetime import date
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import ForeignKey
-from sqlalchemy import String
 
 from src.models.base import Base, TimestampMixin
 
