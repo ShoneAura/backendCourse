@@ -3,7 +3,7 @@ from datetime import date
 from fastapi import APIRouter, Body, Query, HTTPException
 
 from src.api.dependencies import DBDep
-from src.exceptions import DatesAreIncorrectException, ObjectNotFoundException, ObjectIsAlreadyExistsException
+from src.exceptions import DatesAreIncorrectException, ObjectNotFoundException
 from src.schemas.facilities import RoomFacilityAdd
 from src.schemas.rooms import (
     RoomAdd,
