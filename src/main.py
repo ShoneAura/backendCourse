@@ -1,4 +1,3 @@
-import asyncio
 from contextlib import asynccontextmanager
 
 import uvicorn
@@ -11,7 +10,7 @@ from fastapi_cache.backends.redis import RedisBackend
 import sys
 from pathlib import Path
 
-from src.api.dependencies import get_db
+# from src.api.dependencies import get_db
 
 sys.path.append(str(Path(__file__).parent.parent))
 

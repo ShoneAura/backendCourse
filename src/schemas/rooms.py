@@ -1,7 +1,6 @@
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, ConfigDict
 
 from src.schemas.facilities import Facility
-from src.schemas.hotels import Hotel
 
 
 class RoomAddRequest(BaseModel):
