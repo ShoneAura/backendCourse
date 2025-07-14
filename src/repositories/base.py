@@ -2,9 +2,9 @@ from typing import Sequence, Any
 
 from pydantic import BaseModel
 from sqlalchemy import select, insert, delete, update
-from sqlalchemy.exc import NoResultFound
+from sqlalchemy.exc import NoResultFound, IntegrityError
 
-from src.exceptions import ObjectNotFoundException
+from src.exceptions import ObjectNotFoundException, ObjectIsAlreadyExistsException
 from src.repositories.mappers.base import DataMapper
 
 
@@ -48,7 +48,11 @@ class BaseRepository:
             insert(self.model).values(**data.model_dump()).returning(self.model)
         )
         result = await self.session.execute(add_data_stmt)
-        model = result.scalars().one()
+        try:
+            model = result.scalars().one()
+        except IntegrityError:
+            raise ObjectIsAlreadyExistsException
+
         return self.mapper.map_to_domain_entity(model)
 
     async def add_bulk(self, data: Sequence[BaseModel]):
@@ -56,13 +60,22 @@ class BaseRepository:
         await self.session.execute(add_data_stmt)
 
     async def delete(self, **filter_by) -> None:
-        delete_stmt = delete(self.model).filter_by(**filter_by)
-        await self.session.execute(delete_stmt)
+        delete_stmt = delete(self.model).filter_by(**filter_by).returning(self.model.id)
+        res = await self.session.execute(delete_stmt)
+        obj_id = res.scalar()
+        if not obj_id:
+            raise ObjectNotFoundException
 
     async def update(self, data: BaseModel, exclude_unset: bool = False, **filter_by) -> None:
         update_stmt = (
             update(self.model)
             .filter_by(**filter_by)
             .values(**data.model_dump(exclude_unset=exclude_unset))
+            .returning(self.model.id)
         )
-        await self.session.execute(update_stmt)
+
+        res = await self.session.execute(update_stmt)
+        obj_id = res.scalar()
+        if not obj_id:
+            raise ObjectNotFoundException
+
