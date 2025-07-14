@@ -1,18 +1,19 @@
+import logging
 from contextlib import asynccontextmanager
-
-import uvicorn
-from fastapi import FastAPI
-from fastapi.openapi.docs import get_swagger_ui_html
-
-from fastapi_cache import FastAPICache
-from fastapi_cache.backends.redis import RedisBackend
-
 import sys
 from pathlib import Path
+
+from fastapi import FastAPI
+from fastapi.openapi.docs import get_swagger_ui_html
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
+import uvicorn
 
 # from src.api.dependencies import get_db
 
 sys.path.append(str(Path(__file__).parent.parent))
+
+logging.basicConfig(level=logging.INFO)
 
 from src.init import redis_manager
 from src.api.hotels import router as router_hotels
@@ -40,6 +41,7 @@ async def lifespan(app: FastAPI):
     # asyncio.create_task(run_send_email_regularly())
     await redis_manager.connect()
     FastAPICache.init(RedisBackend(redis_manager.redis), prefix="fastapi-cache")
+    logging.info("FastAPI cache initialized")
     yield
     await redis_manager.close()
 
