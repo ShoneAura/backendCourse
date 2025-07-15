@@ -41,7 +41,7 @@ class AuthService(BaseService):
             raise HTTPException(status_code=401, detail="Неверный токен")
 
     async def register_user(self, data: UserRequestAdd):
-        hashed_password = AuthService().hash_password(data.password)
+        hashed_password = self.hash_password(data.password)
         new_user_data = UserAdd(email=data.email, hashed_password=hashed_password)
         try:
             await self.db.users.add(new_user_data)
@@ -53,11 +53,11 @@ class AuthService(BaseService):
         user = await self.db.users.get_user_with_hashed_password(email=data.email)
         if not user:
             raise UserNotFoundException
-        if not AuthService().verify_password(
+        if not self.verify_password(
                 data.password, hashed_password=user.hashed_password
         ):
             raise UserWrongPasswordException
-        access_token = AuthService().create_access_token({"user_id": user.id})
+        access_token = self.create_access_token({"user_id": user.id})
         response.set_cookie(key="access_token", value=access_token)
         return {"access_token": access_token}
 
