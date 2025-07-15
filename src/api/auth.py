@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Response
+from fastapi import APIRouter, Response
 
 from src.api.dependencies import UserIdDep, DBDep
 from src.exceptions import UserIsAlreadyExistsHTTPException, \
@@ -28,7 +28,7 @@ async def login_user(db: DBDep, data: UserRequestAdd, response: Response):
         return await AuthService(db).login_user(data, response)
     except UserNotFoundException:
         raise UserNotFoundHTTPException
-    except NabronirovalHTTPException as ex:
+    except NabronirovalHTTPException:
         raise UserWrongPasswordHTTPException
 
 
