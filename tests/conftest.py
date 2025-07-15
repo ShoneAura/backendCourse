@@ -1,6 +1,5 @@
 # ruff: noqa: E402
 import json
-from typing import AsyncGenerator
 from unittest import mock
 
 mock.patch("fastapi_cache.decorator.cache", lambda *args, **kwargs: lambda f: f).start()
@@ -31,7 +30,7 @@ async def get_db_null_pool():
 
 
 @pytest.fixture(scope="function")
-async def db() -> AsyncGenerator[DBManager]:
+async def db():
     async with DBManager(session_factory=async_session_maker_null_pool) as db:
         async for db in get_db_null_pool():
             yield db
@@ -61,7 +60,7 @@ async def setup_database(check_test_mode):
 
 
 @pytest.fixture(scope="session")
-async def ac() -> AsyncGenerator[AsyncClient]:
+async def ac():
     async with AsyncClient(app=app, base_url="http://test") as ac:
         yield ac
 

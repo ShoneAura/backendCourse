@@ -1,6 +1,6 @@
 from datetime import date, datetime
 
-from src.schemas.bookings import BookingAdd, Booking
+from src.schemas.bookings import BookingAdd
 
 
 async def test_booking_crud(db):
@@ -24,17 +24,10 @@ async def test_booking_crud(db):
     assert booking.user_id == new_booking.user_id
     assert booking.room_id == new_booking.room_id
 
-    update_booking_data = Booking(
-        id=booking.id,
-        user_id=booking.user_id,
-        room_id=booking.room_id,
-        date_from=booking.date_from,
-        date_to=booking.date_to,
-        price=200,
-        created_at=booking.created_at,
-        updated_at=booking.updated_at,
-    )
-    await db.bookings.update(update_booking_data)
+    update_booking_data = booking.model_copy(update={
+        "price": 200
+    })
+    await db.bookings.update(update_booking_data, id=booking.id)
     updated_booking = await db.bookings.get_one_or_none(id=booking.id)
     assert updated_booking
     assert updated_booking.price == 200
